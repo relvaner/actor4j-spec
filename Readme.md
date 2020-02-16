@@ -12,7 +12,7 @@ This text is published under an Creative Commons License (CC BY). The reference 
 | :---: | :---: | :---: | :---: |
 | Initial | Jan 27, 2020 | David A. Bauer | Initial draft |
 | v0.1 | Feb 15, 2020 | David A. Bauer | Theoretical Background, Related Works, Use Cases |
-| v0.2 | Feb 16, 2020 | David A. Bauer | Non-functional Requirements, Functional Requirements (Actor) |
+| v0.2 | Feb 16, 2020 | David A. Bauer | Non-functional Requirements, Functional Requirements (Actor, Actor Types, Life Cycle, Life Cycle - Directives) |
 
 # Introduction #
 
@@ -33,7 +33,6 @@ The actor model is a mathematical model for describing concurrent and distribute
 A reactive system (see Figure 1) should be responsive, i.e. a system should be able to respond adequately depending on the requirements. The response times must be within the defined range, in particular to meet quality requirements and usability. The system must be resilient, i.e. fail-safe when an error occurs, the responsiveness must be further ensured. Replication, partitioning and the concept of supervision as an example are the means of choice to counteract a failure. It is elastic, i.e. even when the system load changes, the system remains responsive by adapting the system to the new requirements (e.g. by using replication, partitioning or rebalancing). Reactive systems are message-oriented, they use asynchronous message communication and are characterized by non-blocking behavior. This means that the system is always ready to respond [[7](#7)].
 
 <img src="doc/images/reactive.jpg" alt="The Reactive Manifesto" width="708" height="270"/>
-
 Fig. 1: The Reactive Manifesto [[7](#7)]
 
 <!--# Scalability #-->
@@ -43,7 +42,6 @@ Fig. 1: The Reactive Manifesto [[7](#7)]
 Actor4j is a Java framework based on the actor model. Actor4j is based on Akka as a reference implementation. Akka is in turn influenced by Erlang, especially by the supervision concept. A new thread pool architecture was designed (see Figure 2), specially designed for the message exchange between the actors. In contrast to Akka, with Actor4j not every actor has its own queue, but there are several task-specific queues that are localized to the assigned thread. Incoming messages are injected via the corresponding thread at the actor. Each actor is permanently assigned to a thread. With this new thread pool architecture, Actor4j has significantly better performance compared to Akka. By default, Akka uses a ForkJoinPool from the Java Concurrency library internally [[1](#1)].
 
 <img src="doc/images/actor4j.jpg" alt="Thread pool architecture of Actor4j" width="452" height="376"/>
-
 Fig. 2: Thread pool architecture of Actor4j [[1](#1)]
 
 In the standard thread pool architecture of Actor4j, four task-specific queues are provided for each thread, one for accepting messages from actors belonging to the same thread, one for accepting messages from actors of another thread, one for accepting messages from the server and a special prioritized one Queue to process internal directives. This procedure makes it possible to dispense with synchronization means, in particular when exchanging messages on the same thread, which significantly increases the performance. All queues are served equally, with the exception of the directive queue, so that the message processing of a queue is not blocking. Another mechanism that was built in is two-level queues, one with synchronization means for external access (external thread access) and one for internal use on the same thread without synchronization means, this also contributes to better performance depending on the application. Necessary blocking operations must be outsourced to special `ResourceActors` to ensure that the system is ready to respond. `ResourceActors` run in their own thread pool [[1](#1)].
@@ -71,7 +69,7 @@ In the standard thread pool architecture of Actor4j, four task-specific queues a
 # Requirements #
 
 ## Functional Requirements ##
-The following keywords are highlighted: `MUST`, `SHOULD` and `CAN`. `MUST` mean that the requirement must be fully met. `SHOULD` means that the requirement can be deviated from in justified cases. `CAN` means that it is an optional requirement.
+The following keywords are highlighted: `MUST`, `SHOULD` and `CAN`. `MUST` mean that the requirement must be fully met. `SHOULD` means that the requirement can be deviated from in justified cases. `CAN` means that it is an optional requirement. Partially based on the documentation on [[6](#6)].
 
 ### Actor ###
 
@@ -95,7 +93,43 @@ Actor 9: Every actor `MUST` have the ability to create child actors.
 
 Actor 10: A message `MUST` consist of a payload, a tag for differentiating between messages, sender address, receiver address, interaction ID, interaction protocol  and an ontology.
 
-### Life cycle ###
+### Actor Types ###
+
+Actor Types 1: Workload tasks `MUST` not be performed within the actor system. Because they block the reactive system and it is no longer responsive. Therefore the class `ResourceActor` is provided. These special actors are executed in a separate thread pool, thus avoiding disturbances within the actor system. It `SHOULD` be distinguished between stateless and stateful actors. The advantage of this distinction lies in the fact that stateless actors can be executed in parallel.
+
+### Life Cycle ###
+
+Life Cycle 1: Every actor `MUST` be activatable or deactivatable (ignoring ingoing messages, except internal messages).
+
+Life Cycle 1: After instantiation the actor `MUST` call the method `preStart`. This method is used for first initializations of the actor.
+
+Life Cycle 2: If the actor is a derivative of the `PersistenActor` it `MUST` execute the recover protocoll. The actor `MUST` be deactivated until the actor gets the recover data from the persistent system. After that the method `recover` `MUST` be called. This method recoveres then the state of the actor. 
+
+Life Cycle 3: An actor `MUST` also be restartable, usually triggered by an exception. In this case, on the old instance `preRestart` `MUST` be called first. Then a new instance `MUST` be generated with the dependency injection container. The old instance `MUST` be replaced by the new instance, and the method `postRestart` `MUST` be called by the new instance. The `preRestart` and `postRestart` methods are used so that the actor can react adequately to the situation of the restart. The marking (UUID) of the original actor `MUST` be retained. This guarantees that references from other actors to this actor will stay valid. 
+
+Life Cycle 4: An actor `MUST` be stoppable either by calling the `stop` method or by receiving the `STOP` or `POISONPILL` message.
+
+### Life Cycle - Directives ###
+
+There `MUST` be supported eight directives: `RESUME`, `STOP`, `TERMINATED`, `RESTART`, `ESCALATE`, `RECOVER`, `ACTIVATE` and `DEACTIVATE`. Stopping, restarting and recovering of the actors `MUST` be asynchronous.
+
+- `RESUME`: In this case, the supervisor remains passive. The actor can continue its activities undisturbed.
+- `STOP`: 
+	- To all children the message `STOP` is be sent (recursive process, if the children also have children) so that they can terminate. Use of `watch`, to observe that all children have terminated.
+	- Call of `postStop`.
+- `TERMINATED`: Actor is stopped.
+- `RESTART`:
+	- `PreRestart` is called at the current instance.
+	- To all children the message `STOP` is sent (recursive process, if the children also have children) so that they can terminate. Use of `watch`, to observe that all children have terminated.
+	- Call of `postStop` at the current instance, after all children have finished and confirmed this with the `TERMINATED` message.
+	- Instantiate a new instance with the dependency injection container. It is ensured that the `UUID` is maintained.
+	- Call of `postRestart` (with `preStart` (with optional `recover`) for the new instance.
+- `ESCALATE`: If a supervisor is unclear as to what the correct strategy is in the event of a specific error, he can pass it on to his superior supervisor for clarification.
+- `RECOVER`: The actor will be recovered to it's last state, novel events can lead to an update of the actor's state.
+- `ACTIVATE` and `DEACTIAVTE`: Activates or deactivates the actor (messages will be or not longer processed). The current explained directives remains deliverable, even when the actor is deactivated.
+
+<img src="doc/images/lifecycle2.png" alt="Extended representation of the life cycle of an actor" width="800" height="455"/>
+Fig. 3: Extended representation of the life cycle of an actor [[6](#6)]
 
 ### Monitoring ###
 
