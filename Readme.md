@@ -33,6 +33,7 @@ The actor model is a mathematical model for describing concurrent and distribute
 A reactive system (see Figure 1) should be responsive, i.e. a system should be able to respond adequately depending on the requirements. The response times must be within the defined range, in particular to meet quality requirements and usability. The system must be resilient, i.e. fail-safe when an error occurs, the responsiveness must be further ensured. Replication, partitioning and the concept of supervision as an example are the means of choice to counteract a failure. It is elastic, i.e. even when the system load changes, the system remains responsive by adapting the system to the new requirements (e.g. by using replication, partitioning or rebalancing). Reactive systems are message-oriented, they use asynchronous message communication and are characterized by non-blocking behavior. This means that the system is always ready to respond [[7](#7)].
 
 <img src="doc/images/reactive.jpg" alt="The Reactive Manifesto" width="708" height="270"/>
+
 Fig. 1: The Reactive Manifesto [[7](#7)]
 
 <!--# Scalability #-->
@@ -42,6 +43,7 @@ Fig. 1: The Reactive Manifesto [[7](#7)]
 Actor4j is a Java framework based on the actor model. Actor4j is based on Akka as a reference implementation. Akka is in turn influenced by Erlang, especially by the supervision concept. A new thread pool architecture was designed (see Figure 2), specially designed for the message exchange between the actors. In contrast to Akka, with Actor4j not every actor has its own queue, but there are several task-specific queues that are localized to the assigned thread. Incoming messages are injected via the corresponding thread at the actor. Each actor is permanently assigned to a thread. With this new thread pool architecture, Actor4j has significantly better performance compared to Akka. By default, Akka uses a ForkJoinPool from the Java Concurrency library internally [[1](#1)].
 
 <img src="doc/images/actor4j.jpg" alt="Thread pool architecture of Actor4j" width="452" height="376"/>
+
 Fig. 2: Thread pool architecture of Actor4j [[1](#1)]
 
 In the standard thread pool architecture of Actor4j, four task-specific queues are provided for each thread, one for accepting messages from actors belonging to the same thread, one for accepting messages from actors of another thread, one for accepting messages from the server and a special prioritized one Queue to process internal directives. This procedure makes it possible to dispense with synchronization means, in particular when exchanging messages on the same thread, which significantly increases the performance. All queues are served equally, with the exception of the directive queue, so that the message processing of a queue is not blocking. Another mechanism that was built in is two-level queues, one with synchronization means for external access (external thread access) and one for internal use on the same thread without synchronization means, this also contributes to better performance depending on the application. Necessary blocking operations must be outsourced to special `ResourceActors` to ensure that the system is ready to respond. `ResourceActors` run in their own thread pool [[1](#1)].
@@ -129,6 +131,7 @@ There `MUST` be supported eight directives: `RESUME`, `STOP`, `TERMINATED`, `RES
 - `ACTIVATE` and `DEACTIAVTE`: Activates or deactivates the actor (messages will be or not longer processed). The current explained directives remains deliverable, even when the actor is deactivated.
 
 <img src="doc/images/lifecycle2.png" alt="Extended representation of the life cycle of an actor" width="800" height="455"/>
+
 Fig. 3: Extended representation of the life cycle of an actor [[6](#6)]
 
 ### Monitoring ###
