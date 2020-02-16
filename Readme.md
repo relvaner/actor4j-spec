@@ -12,6 +12,7 @@ This text is published under an Creative Commons License (CC BY). The reference 
 | :---: | :---: | :---: | :---: |
 | Initial | Jan 27, 2020 | David A. Bauer | Initial draft |
 | v0.1 | Feb 15, 2020 | David A. Bauer | Theoretical Background, Related Works, Use Cases |
+| v0.2 | Feb 16, 2020 | David A. Bauer | Non-functional Requirements, Functional Requirements (Actor) |
 
 # Introduction #
 
@@ -45,7 +46,7 @@ Actor4j is a Java framework based on the actor model. Actor4j is based on Akka a
 
 Fig. 2: Thread pool architecture of Actor4j [[1](#1)]
 
-In the standard thread pool architecture of Actor4j, four task-specific queues are provided for each thread, one for accepting messages from actors belonging to the same thread, one for accepting messages from actors of another thread, one for accepting messages from the server and a special prioritized one Queue to process internal directives. This procedure makes it possible to dispense with synchronization means, in particular when exchanging messages on the same thread, which significantly increases the performance. All queues are served equally, with the exception of the directive queue, so that the message processing of a queue is not blocked. Another mechanism that was built in is two-level queues, one with synchronization means for external access (external thread access) and one for internal use on the same thread without synchronization means, this also contributes to better performance depending on the application. Necessary blocking operations must be outsourced to special `ResourceActors` to ensure that the system is ready to respond. `ResourceActors` run in their own thread pool [[1](#1)].
+In the standard thread pool architecture of Actor4j, four task-specific queues are provided for each thread, one for accepting messages from actors belonging to the same thread, one for accepting messages from actors of another thread, one for accepting messages from the server and a special prioritized one Queue to process internal directives. This procedure makes it possible to dispense with synchronization means, in particular when exchanging messages on the same thread, which significantly increases the performance. All queues are served equally, with the exception of the directive queue, so that the message processing of a queue is not blocking. Another mechanism that was built in is two-level queues, one with synchronization means for external access (external thread access) and one for internal use on the same thread without synchronization means, this also contributes to better performance depending on the application. Necessary blocking operations must be outsourced to special `ResourceActors` to ensure that the system is ready to respond. `ResourceActors` run in their own thread pool [[1](#1)].
 
 # Use Cases #
 
@@ -72,11 +73,54 @@ In the standard thread pool architecture of Actor4j, four task-specific queues a
 ## Functional Requirements ##
 The following keywords are highlighted: `MUST`, `SHOULD` and `CAN`. `MUST` mean that the requirement must be fully met. `SHOULD` means that the requirement can be deviated from in justified cases. `CAN` means that it is an optional requirement.
 
+### Actor ###
+
+Actor 1: Every actor `MUST`be associated with an actor cell, that contains the actor.
+
+Actor 2: The system logic of the actor `MUST` be implemented within the actor cell, that acts as a wrapper.
+
+Actor 3: Every actor `MUST` have a unique ID.
+
+Actor 4: Every actor `MUST` have a parent actor.
+
+Actor 5: Every actor `MUST`be adressable through a path.
+
+Actor 6: Every actor `MUST` have a method handler for receiving messages. The corresponding message is injected.
+
+Actor 7: Every actor `MUST` have the ability to send messages to other actors.
+
+Actor 8: An alias `MUST` be associable with an actor, for easier addressing.
+
+Actor 9: Every actor `MUST` have the ability to create child actors.
+
+Actor 10: A message `MUST` consist of a payload, a tag for differentiating between messages, sender address, receiver address, interaction ID, interaction protocol  and an ontology.
+
+### Life cycle ###
+
+### Monitoring ###
+
+### Supervision ###
+
+### Persistence ###
+
+### Execution ###
+
 ## Non-functional Requirements ##
 
-# Conception #
+NF 1: Ensures `High Reponsiveness` for their clients (see concept of thread pool architecture, actors are receiving messages in sequential order from the sender).
+
+NF 2: Ensures `Non-Blocking Behavior` through asynchronous communication style (also related to responsiveness, for computationally intensive tasks there exist an extra thread pool, in Actor4j this actors are called resource actors).
+
+NF 3: Ensures `High Resilience` (Robustness) through the supervision concept (see also Erlang, restarting of actors in occurrence of failure)
+
+NF 4: Ensures `Simplicity` in modeling an actor in a concurrent environment (key-concept of the actor model, all actors are executed in a safe place, no corruption in state possible by using immutable objects for communication between actors).
+
+
+<!--# Conception #-->
 
 # Implementation #
+
+Reference implementation for Actor4j can be found under following link: https://github.com/relvaner/actor4j-core, as well additional libraries for Actor4j (see: https://github.com/relvaner?utf8=%E2%9C%93&tab=repositories&q=actor4j&type=&language=).
 
 <!--# Evaluation #-->
 
