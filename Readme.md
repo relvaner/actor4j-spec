@@ -13,6 +13,7 @@ This text is published under an Creative Commons License (CC BY). The reference 
 | Initial | Jan 27, 2020 | David A. Bauer | Initial draft |
 | v0.1 | Feb 15, 2020 | David A. Bauer | Theoretical Background, Related Works, Use Cases |
 | v0.2 | Feb 16, 2020 | David A. Bauer | Non-functional Requirements, Functional Requirements (Actor, Actor Types, Life Cycle, Life Cycle - Directives) |
+| v0.3 | Feb 17, 2020 | David A. Bauer | Functional Requirements ( Actor Types, Monitoring, Supervision, Persistence, Execution) |
 
 # Introduction #
 
@@ -46,7 +47,7 @@ Actor4j is a Java framework based on the actor model. Actor4j is based on Akka a
 
 Fig. 2: Thread pool architecture of Actor4j [[1](#1)]
 
-In the standard thread pool architecture of Actor4j, four task-specific queues are provided for each thread, one for accepting messages from actors belonging to the same thread, one for accepting messages from actors of another thread, one for accepting messages from the server and a special prioritized one Queue to process internal directives. This procedure makes it possible to dispense with synchronization means, in particular when exchanging messages on the same thread, which significantly increases the performance. All queues are served equally, with the exception of the directive queue, so that the message processing of a queue is not blocking. Another mechanism that was built in is two-level queues, one with synchronization means for external access (external thread access) and one for internal use on the same thread without synchronization means, this also contributes to better performance depending on the application. Necessary blocking operations must be outsourced to special `ResourceActors` to ensure that the system is ready to respond. `ResourceActors` run in their own thread pool [[1](#1)].
+In the standard thread pool architecture of Actor4j, four task-specific queues are provided for each thread, one for accepting messages from actors belonging to the same thread, one for accepting messages from actors of another thread, one for accepting messages from the server and a special prioritized one queue to process internal directives. This procedure makes it possible to dispense with synchronization means, in particular when exchanging messages on the same thread, which significantly increases the performance. All queues are served equally, with the exception of the directive queue, so that the message processing of a queue is not blocking. Another mechanism that was built in is two-level queues, one with synchronization means for external access (external thread access) and one for internal use on the same thread without synchronization means, this also contributes to better performance depending on the application. Necessary blocking operations must be outsourced to special `ResourceActors` to ensure that the system is ready to respond. `ResourceActors` run in their own thread pool [[1](#1)].
 
 # Use Cases #
 
@@ -97,7 +98,13 @@ Actor 10: A message `MUST` consist of a payload, a tag for differentiating betwe
 
 ### Actor Types ###
 
-Actor Types 1: Workload tasks `MUST` not be performed within the actor system. Because they block the reactive system and it is no longer responsive. Therefore the class `ResourceActor` is provided. These special actors are executed in a separate thread pool, thus avoiding disturbances within the actor system. It `SHOULD` be distinguished between stateless and stateful actors. The advantage of this distinction lies in the fact that stateless actors can be executed in parallel.
+Actor Types 1: Actors within the actor system `MUST` be derived from the class `Actor`. Actors of this type `MUST` not have blocking behavior.
+
+Actor Types 2: Workload tasks `MUST` not be performed within the actor system. Because they block the reactive system and it is no longer responsive. Therefore the class `ResourceActor` is provided. These special actors are executed in a separate thread pool, thus avoiding disturbances within the actor system. It `SHOULD` be distinguished between stateless and stateful actors. The advantage of this distinction lies in the fact that stateless actors can be executed in parallel.
+
+Actor Types 3: A `PseudoActor` is a mediator between the outside world and the actor system. It allows communication with the actors within the actor system from the outside. Unlike the other actors, the `PseudoActor` `MUST` have its own message queue, in which the messages of other actors can then be stored by the actor system.
+
+Actor Types 4: To persist the state of an actor, this `MUST` be derived from the `PersistentActor` class. A `PersistentActor` is characterized by events and a state, which can be saved, depending on use case.
 
 ### Life Cycle ###
 
@@ -136,11 +143,39 @@ Fig. 3: Extended representation of the life cycle of an actor [[6](#6)]
 
 ### Monitoring ###
 
+An actor `MUST` also have the option to monitor another actor for that it has not yet terminated itself. If the observed actor is terminated, a message `TERMINATED` is sent to the observer.
+
 ### Supervision ###
+
+Supervision 1: The supervisor actor `MUST` monitors its child actors, in the event of an error, they are resumed or restarted or stopped by them.
+
+Supervision 2: Two strategies `MUST` be foreseen (see Fig. 4). In the `OneForOne-Strategy`, only the affected actor `MUST` be considered. In the `OneForAll-Strategy`, on the other hand, not only the affected actor `MUST` be considered but also the neighbouring actors (below the supervisor actor).
+
+<img src="doc/images/supervision.png" alt="OneForOne-Strategy and OneForAll-Strategy" width="589" height="268"/>
+
+Fig. 4: OneForOne-Strategy and OneForAll-Strategy [[6](#6)]
 
 ### Persistence ###
 
+Persistence 1: The principles of event sourcing `MUST` be followed.
+
+Persistence 2: Events and states snapshots of an actor `MUST` be saveable.
+
+Persistence 3: A recovery of the last state `MUST` be possible, by replaying the events since the last state snapshot, in case of an error.
+
 ### Execution ###
+
+Execution 1: Each actor `MUST` be permanently assigned to a thread.
+
+Execution 2: Four task-specific queues `SHOULD` be provided for each thread, one for accepting messages from actors belonging to the same thread, one for accepting messages from actors of another thread, one for accepting messages from the server and a special prioritized one queue to process internal directives.
+
+Execution 3: All queues `SHOULD` served equally (by defining a fixed throughput), with the exception of the directive queue, so that the message processing of a queue is not blocking.
+
+Execution 4: The directive queue `MUST` be served first, to maintain the consistency of the system.
+
+Execution 5: Two-level queues architecture `SHOULD` be established, one with synchronization means for external access (external thread access) and one for internal use on the same thread without synchronization mean. 
+
+Execution 6: Incoming messages `MUST` be injected via the corresponding thread at the actor.
 
 ## Non-functional Requirements ##
 
@@ -151,7 +186,6 @@ NF 2: Ensures `Non-Blocking Behavior` through asynchronous communication style (
 NF 3: Ensures `High Resilience` (Robustness) through the supervision concept (see also Erlang, restarting of actors in occurrence of failure)
 
 NF 4: Ensures `Simplicity` in modeling an actor in a concurrent environment (key-concept of the actor model, all actors are executed in a safe place, no corruption in state possible by using immutable objects for communication between actors).
-
 
 <!--# Conception #-->
 
