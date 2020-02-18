@@ -14,6 +14,7 @@ This text is published under an Creative Commons License (CC BY). The reference 
 | v0.1 | Feb 15, 2020 | David A. Bauer | Theoretical Background, Related Works, Use Cases |
 | v0.2 | Feb 16, 2020 | David A. Bauer | Non-functional Requirements, Functional Requirements (Actor, Actor Types, Life Cycle, Life Cycle - Directives) |
 | v0.3 | Feb 17, 2020 | David A. Bauer | Functional Requirements ( Actor Types, Monitoring, Supervision, Persistence, Execution) |
+| v0.4 | Feb 18, 2020 | David A. Bauer | Conception, Architectural Overall Concept |
 
 # Introduction #
 
@@ -187,7 +188,21 @@ NF 3: Ensures `High Resilience` (Robustness) through the supervision concept (se
 
 NF 4: Ensures `Simplicity` in modeling an actor in a concurrent environment (key-concept of the actor model, all actors are executed in a safe place, no corruption in state possible by using immutable objects for communication between actors).
 
-<!--# Conception #-->
+# Conception #
+
+## Architectural Overall Concept ##
+
+The actor semantics and the principles of reactive manifesto `MUST` be taken into account by designing the architecture. Akka is used as a co-reference implementation (for not reinventing the wheel again).
+
+| Advantages  | Disadvantages |
+| :---: | :---: |
+| Responsive (non-blocking behaviour) | Susceptible for message floodig (not more responsive), slows down the system |
+| Resilient (supervision concept) | Intense computational tasks (blocking behaviour, to counteract use extra threadpool for that) |
+| Thread-safe (actors are isolated, usage of immutable messages) |  More latancy through asynchronous message communication style (instead of calling pure methods synchronously) |
+| Easier concurrency (through simplicity) | |
+| Using lock-free queues | |
+
+Tab. 1: Advantages & Disadvantages of the Architecture
 
 # Implementation #
 
