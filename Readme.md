@@ -2,6 +2,8 @@
 
 ## Abstract ##
 
+This specification describes Actor4j's core concepts. A brief introduction to the actor model and reactive systems is given. Under Related Work, the used thread pool architecture specially designed for message passing is described. Requirements for actors, actor types, life cycle (& directives), monitoring, persistence and execution are defined. Then the non-functional requirements follow. A brief overall architectural concept is given.
+
 ## License ##
 
 This text is published under an Creative Commons License (CC BY). The reference implementation is licensed under Apache License 2.0.
@@ -18,7 +20,7 @@ This text is published under an Creative Commons License (CC BY). The reference 
 
 # Introduction #
 
-This specification is primarly based on the paper by David A. Bauer et al. [[1](#1)] in 2018.
+This specification is mainly based on the paper by David A. Bauer et al. [[1](#1)] in 2018 and from the general documentation of Actor4j [[6](#6)]. Actor4j has been under development since the end of 2015. 
 
 # Publications #
 
@@ -66,6 +68,8 @@ In the standard thread pool architecture of Actor4j, four task-specific queues a
 - Internet of Things
 - Digital representatives of devices (see Device Shadows, AWS IoT)
 - Functions (here actors) as nano services
+- Transaction processing
+- Blockchain
 - Batch-processing and stream-processing
 
 (Adapted list from [[6](#6)])
@@ -73,7 +77,7 @@ In the standard thread pool architecture of Actor4j, four task-specific queues a
 # Requirements #
 
 ## Functional Requirements ##
-The following keywords are highlighted: `MUST`, `SHOULD` and `CAN`. `MUST` mean that the requirement must be fully met. `SHOULD` means that the requirement can be deviated from in justified cases. `CAN` means that it is an optional requirement. Partially based on the documentation on [[6](#6)].
+The following keywords are highlighted: `MUST`, `SHOULD` and `CAN`. `MUST` mean that the requirement must be fully met. `SHOULD` means that the requirement can be deviated from in justified cases. `CAN` means that it is an optional requirement.
 
 ### Actor ###
 
@@ -106,6 +110,8 @@ Actor Types 2: Workload tasks `MUST` not be performed within the actor system. B
 Actor Types 3: A `PseudoActor` is a mediator between the outside world and the actor system. It allows communication with the actors within the actor system from the outside. Unlike the other actors, the `PseudoActor` `MUST` have its own message queue, in which the messages of other actors can then be stored by the actor system.
 
 Actor Types 4: To persist the state of an actor, this `MUST` be derived from the `PersistentActor` class. A `PersistentActor` is characterized by events and a state, which can be saved, depending on use case.
+
+Actor Types 5: An `EmbeddedActor` provides a lightweighted alternative to the classical actor, they `MUST` run in a classical host actor. A queue for delivering messages is not necessarily needed for the embedded actors, only if it is needed to address some embedded actor within the host actor. The receiving method for messages for that embedded actor is simply called synchronously within the host actor. 
 
 ### Life Cycle ###
 
@@ -192,14 +198,14 @@ NF 4: Ensures `Simplicity` in modeling an actor in a concurrent environment (key
 
 ## Architectural Overall Concept ##
 
-The actor semantics and the principles of reactive manifesto `MUST` be taken into account by designing the architecture. Akka is used as a co-reference implementation (for not reinventing the wheel again).
+The actor semantics [[8](#8)] and the principles of reactive manifesto [[7](#7)] `MUST` be taken into account by designing the architecture. Akka is used as a co-reference implementation (for not reinventing the wheel again).
 
 | Advantages  | Disadvantages |
 | :---: | :---: |
-| Responsive (non-blocking behaviour) | Susceptible for message floodig (not more responsive), slows down the system |
-| Resilient (supervision concept) | Intense computational tasks (blocking behaviour, to counteract use extra threadpool for that) |
-| Thread-safe (actors are isolated, usage of immutable messages) |  More latancy through asynchronous message communication style (instead of calling pure methods synchronously) |
-| Easier concurrency (through simplicity) | |
+| Responsive (non-blocking behaviour) | Susceptible for message floodig (not more responsive), slows down the system; to counteract this the count of newly created messages between actors at anytime in the system should be less or equals to the count of actors |
+| Resilient (supervision concept) | Intense computational tasks (blocking behaviour, to counteract this use an extra threadpool) |
+| Thread-safe (actors are isolated, usage of immutable messages) |  More latancy through asynchronous message communication style (instead of calling pure methods synchronously), to counteract this use embedded actors |
+| Easier concurrency (through simplicity) | Possibility of logical errors due to increasing complexity, occurrence of undesired cycles, unreachable or dead states, to counteract this use verfication |
 | Using lock-free queues | |
 
 Tab. 1: Advantages & Disadvantages of the Architecture
@@ -211,6 +217,8 @@ Reference implementation for Actor4j can be found under following link: https://
 <!--# Evaluation #-->
 
 # Conclusion #
+
+The focus of this brief specification is to give an overall impression of how actor-oriented systems like Actor4j can be designed.
 
 # References #
 [1]<a name="1"/> D. A. Bauer and J. Mäkiö, “Actor4j: A Software Framework for the Actor Model Focusing on the Optimization of Message Passing,” AICT 2018: The Fourteenth Advanced International Conference on Telecommunications, IARIA, Barcelona, Spain 2018, pp. 125-134, [Online]. Available from: http://www.thinkmind.org/download.php?articleid=aict_2018_8_10_10087
@@ -226,3 +234,5 @@ Reference implementation for Actor4j can be found under following link: https://
 [6]<a name="6"/> D. A. Bauer, "Actor4j," 2019, [Online]. Available from: https://github.com/relvaner/actor4j-core
 
 [7]<a name="7"/> J. Bonér, D. Farley, R. Kuhn, M. Thompson, and Community, “The Reactive Manifesto,” 2014, [Online]. Available from: http://www.reactivemanifesto.org/  
+
+[8]<a name="8"/> R. K. Karmani, A. Shali, and G. Agha, “Actor frameworks for the JVM platform: a  comparative  analysis,” in PPPJ, ACM, 2009, [Online]. Available from: http://doi.acm.org/10.1145/1596655.1596658
