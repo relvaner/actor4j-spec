@@ -17,6 +17,7 @@ This text is published under an Creative Commons License (CC BY). The reference 
 | v0.2 | Feb 16, 2020 | David A. Bauer | Non-functional Requirements, Functional Requirements (Actor, Actor Types, Life Cycle, Life Cycle - Directives) |
 | v0.3 | Feb 17, 2020 | David A. Bauer | Functional Requirements ( Actor Types, Monitoring, Supervision, Persistence, Execution) |
 | v0.4 | Feb 18, 2020 | David A. Bauer | Conception, Architectural Overall Concept |
+| v0.5 | Oct 25, 2020 | David A. Bauer | Functional Requirements (Actor) |
 
 # Introduction #
 
@@ -99,7 +100,7 @@ Actor 8: An alias `MUST` be associable with an actor, for easier addressing.
 
 Actor 9: Every actor `MUST` have the ability to create child actors.
 
-Actor 10: A message `MUST` consist of a payload, a tag for differentiating between messages, sender address, receiver address, interaction ID, interaction protocol  and an ontology.
+Actor 10: A message `MUST` consist of a payload, a tag for differentiating between messages, sender address, receiver address, interaction ID, interaction protocol and an associated domain.
 
 ### Actor Types ###
 
