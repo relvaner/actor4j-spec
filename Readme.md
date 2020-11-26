@@ -18,6 +18,7 @@ This text is published under an Creative Commons License (CC BY). The reference 
 | v0.3 | Feb 17, 2020 | David A. Bauer | Functional Requirements ( Actor Types, Monitoring, Supervision, Persistence, Execution) |
 | v0.4 | Feb 18, 2020 | David A. Bauer | Conception, Architectural Overall Concept |
 | v0.5 | Oct 25, 2020 | David A. Bauer | Functional Requirements (Actor) |
+| v0.6 | Nov 26, 2020 | David A. Bauer | Conception, Architectural Overall Concept |
 
 # Introduction #
 
@@ -204,6 +205,7 @@ The actor semantics [[8](#8)] and the principles of reactive manifesto [[7](#7)]
 | Advantages  | Disadvantages |
 | :---: | :---: |
 | Responsive (non-blocking behaviour) | Susceptible for message floodig (not more responsive), slows down the system; to counteract this the count of newly created messages between actors at anytime in the system should be less or equals to the count of actors |
+| Asynchronous message passing (temporal decoupling) | There is no guarantee for a rendezvous between sender and receiver. |
 | Resilient (supervision concept) | Intense computational tasks (blocking behaviour, to counteract this use an extra threadpool) |
 | Thread-safe (actors are isolated, usage of immutable messages) |  More latancy through asynchronous message communication style (instead of calling pure methods synchronously), to counteract this use embedded actors |
 | Easier concurrency (through simplicity) | Possibility of logical errors due to increasing complexity, occurrence of undesired cycles, unreachable or dead states, to counteract this use verfication |
