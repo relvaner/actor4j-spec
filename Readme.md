@@ -19,6 +19,7 @@ This text is published under an Creative Commons License (CC BY). The reference 
 | v0.4 | Feb 18, 2020 | David A. Bauer | Conception, Architectural Overall Concept |
 | v0.5 | Oct 25, 2020 | David A. Bauer | Functional Requirements (Actor) |
 | v0.6 | Nov 26, 2020 | David A. Bauer | Conception, Architectural Overall Concept |
+| v0.7 | Oct 12, 2021 | David A. Bauer | Objectives |
 
 # Introduction #
 
@@ -46,7 +47,7 @@ Fig. 1: The Reactive Manifesto [[7](#7)]
 
 # Related Works #
 
-Actor4j is a Java framework based on the actor model. Actor4j is based on Akka as a reference implementation. Akka is in turn influenced by Erlang, especially by the supervision concept. A new thread pool architecture was designed (see Figure 2), specially designed for the message exchange between the actors. In contrast to Akka, with Actor4j not every actor has its own queue, but there are several task-specific queues that are localized to the assigned thread. Incoming messages are injected via the corresponding thread at the actor. Each actor is permanently assigned to a thread. With this new thread pool architecture, Actor4j has significantly better performance compared to Akka. By default, Akka uses a ForkJoinPool from the Java Concurrency library internally [[1](#1)].
+Actor4j is a Java framework based on the actor model. Actor4j is based on Akka as a reference implementation. Akka is in turn influenced by Erlang, especially by the supervision concept. A new thread pool architecture was designed (see Figure 2), specially designed for the exchange of messages between the actors. In contrast to Akka, with Actor4j not every actor has its own queue, but there are several task-specific queues that are localized to the assigned thread. Incoming messages are injected via the corresponding thread at the actor. Each actor is permanently assigned to a thread. With this new thread pool architecture, Actor4j has significantly better performance compared to Akka. By default, Akka uses a ForkJoinPool from the Java Concurrency library internally [[1](#1)].
 
 <img src="doc/images/actor4j.jpg" alt="Thread pool architecture of Actor4j" width="452" height="376"/>
 
@@ -75,6 +76,14 @@ In the standard thread pool architecture of Actor4j, four task-specific queues a
 - Batch-processing and stream-processing
 
 (Adapted list from [[6](#6)])
+
+# Objectives #
+
+Objective 1: Implementing a Java framework based on the actor model.
+
+Objective 2: Introduction of a novel thread pool architecture with significantly better performance, which is specially designed for the exchange of messages between the actors. Message queues are located on the thread.
+
+Objective 3: Ensuring that the actor semantics [[8](#8)] and the principles of reactive manifesto [[7](#7)] are taken into account when designing the overall architecture.
 
 # Requirements #
 
@@ -200,7 +209,7 @@ NF 4: Ensures `Simplicity` in modeling an actor in a concurrent environment (key
 
 ## Architectural Overall Concept ##
 
-The actor semantics [[8](#8)] and the principles of reactive manifesto [[7](#7)] `MUST` be taken into account by designing the architecture. Akka is used as a co-reference implementation (for not reinventing the wheel again).
+The actor semantics [[8](#8)] and the principles of reactive manifesto [[7](#7)] `MUST` be taken into account when designing the architecture. Akka is used as a co-reference implementation (for not reinventing the wheel again).
 
 | Advantages  | Disadvantages |
 | :---: | :---: |
