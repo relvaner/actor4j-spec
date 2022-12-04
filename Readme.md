@@ -215,9 +215,9 @@ The actor semantics [[8](#8)] and the principles of reactive manifesto [[7](#7)]
 | :---: | :---: |
 | Responsive (non-blocking behavior) | Susceptible for message flooding (not more responsive), slows down the system; to counteract this, the count of newly created messages between actors at any time in the system should be less or equal to the count of actors |
 | Asynchronous message passing (temporal decoupling) | There is no guarantee for a rendezvous between sender and receiver. |
-| Resilient (supervision concept) | Intense computational tasks (blocking behavior, to counteract this, use an extra thread pool) |
+| Resilient (supervision concept) | Intense computational tasks (blocking behavior; to counteract this, use an extra thread pool) |
 | Thread-safe (actors are isolated, usage of immutable messages) |  More latency through asynchronous message communication style (instead of calling pure methods synchronously); to counteract this, use embedded actors |
-| Easier concurrency (through simplicity) | Possibility of logical errors due to increasing complexity, the occurrence of undesired cycles, unreachable or dead states, to counteract this use verification |
+| Easier concurrency (through simplicity) | Possibility of logical errors due to increasing complexity, the occurrence of undesired cycles, unreachable or dead states; to counteract this, use verification |
 | Using lock-free queues | |
 
 Tab. 1: Advantages & Disadvantages of the Architecture
