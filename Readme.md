@@ -219,7 +219,7 @@ The actor semantics [[8](#8)] and the principles of reactive manifesto [[7](#7)]
 | Thread-safe (actors are isolated, usage of immutable messages) |  More latency through asynchronous message communication style (instead of calling pure methods synchronously); to counteract this, use embedded actors |
 | Easier concurrency (through simplicity) | Possibility of logical errors due to increasing complexity, the occurrence of undesired cycles, unreachable or dead states; to counteract this, use verification |
 | Using lock-free queues | |
-| Potential mobility is enabled through the underlying recovery functionality | |
+| Potential mobility can be realized through the underlying recovery functionality | |
 
 Tab. 1: Advantages & Disadvantages of the Architecture
 
