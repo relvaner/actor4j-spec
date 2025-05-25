@@ -1,4 +1,4 @@
-# Actor4j - Specification #
+# Actor4j - Specification (related to default runtime) #
 
 ## Abstract ##
 
