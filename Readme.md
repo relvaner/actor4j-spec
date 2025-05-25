@@ -25,9 +25,7 @@ This text is published under a Creative Commons License (CC BY). The reference i
 
 This specification is mainly based on the paper by David A. Bauer et al. [[1](#1)] in 2018 and from the general documentation of Actor4j [[6](#6)]. Actor4j has been under development since the end of 2015. 
 
-# Publications #
-
-D. A. Bauer and J. Mäkiö, "Hybrid Cloud – Architecture for Administration Shells with RAMI4.0 Using Actor4j," 2019 IEEE 17th International Conference on Industrial Informatics (INDIN), Helsinki, Finland 2019, pp. 79-86, [Online]. Available from: https://doi.org/10.1109/INDIN41052.2019.8972075
+# Related Publications #
 
 D. A. Bauer and J. Mäkiö, “Actor4j: A Software Framework for the Actor Model Focusing on the Optimization of Message Passing,” AICT 2018: The Fourteenth Advanced International Conference on Telecommunications, IARIA, Barcelona, Spain 2018, pp. 125-134, [Online]. Available from: http://www.thinkmind.org/download.php?articleid=aict_2018_8_10_10087
 
