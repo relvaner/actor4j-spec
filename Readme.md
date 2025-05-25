@@ -1,4 +1,4 @@
-# Actor4j - Specification (related to default runtime) #
+# Actor4j - Specification#
 
 ## Abstract ##
 
@@ -43,7 +43,7 @@ Fig. 1: The Reactive Manifesto [[7](#7)]
 
 <!--# Scalability #-->
 
-# Related Works #
+# Related Works – Default Runtime  #
 
 Actor4j is a Java framework based on the actor model. Actor4j is based on Akka as a reference implementation. Akka is, in turn, influenced by Erlang, especially by the supervision concept. A new thread pool architecture was designed (see Figure 2), specially designed for the exchange of messages between the actors. In contrast to Akka, with Actor4j, not every actor has its own queue, but several task-specific queues are localized to the assigned thread. Incoming messages are injected via the corresponding thread at the actor. Each actor is permanently assigned to a thread. With this new thread pool architecture, Actor4j performs significantly better than Akka. By default, Akka uses a ForkJoinPool from the Java Concurrency library internally [[1](#1)].
 
