@@ -20,6 +20,7 @@ This text is published under a Creative Commons License (CC BY). The reference i
 | v0.5 | Oct 25, 2020 | David A. Bauer | Functional Requirements (Actor) |
 | v0.6 | Nov 26, 2020 | David A. Bauer | Conception, Architectural Overall Concept |
 | v0.7 | Oct 12, 2021 | David A. Bauer | Objectives |
+| v0.8 | Oct 7, 2026 | David A. Bauer | Reference to multi-runtime architecture (IECON 2025) |
 
 # Introduction #
 
@@ -28,6 +29,8 @@ This specification is mainly based on the paper by David A. Bauer et al. [[1](#1
 # Related Publications #
 
 D. A. Bauer and J. Mäkiö, “Actor4j: A Software Framework for the Actor Model Focusing on the Optimization of Message Passing,” AICT 2018: The Fourteenth Advanced International Conference on Telecommunications, IARIA, Barcelona, Spain 2018, pp. 125-134, [Online]. Available from: http://www.thinkmind.org/download.php?articleid=aict_2018_8_10_10087
+
+D. A. Bauer and J. Mäkiö, “Multi-Runtime Actor Model Implementation and Benchmarks,” IECON 2025 – 51st Annual Conference of the IEEE Industrial Electronics Society, Madrid, Spain, 2025. [Online]. Available from: https://doi.org/10.1109/iecon58223.2025.11221487
 
 # Actor Model #
 
@@ -181,6 +184,8 @@ Persistence 3: A recovery of the last state `MUST` be possible by replaying the 
 
 ### Execution ###
 
+> **Note:** The following execution requirements describe the default runtime (thread-bound message queues). For the multi-runtime architecture (default, classic, and Loom-based runtime), see [[9](#9)].
+
 Execution 1: Each actor `MUST` be permanently assigned to a thread.
 
 Execution 2: Four task-specific queues `SHOULD` be provided for each thread, one for accepting messages from actors belonging to the same thread, one for accepting messages from actors of another thread, one for accepting messages from the server, and a special prioritized one queue to process internal directives.
@@ -247,3 +252,5 @@ The focus of this brief specification is to give an overall impression of how ac
 [7]<a name="7"/> J. Bonér, D. Farley, R. Kuhn, M. Thompson, and Community, “The Reactive Manifesto,” 2014, [Online]. Available from: http://www.reactivemanifesto.org/  
 
 [8]<a name="8"/> R. K. Karmani, A. Shali, and G. Agha, “Actor frameworks for the JVM platform: a  comparative  analysis,” in PPPJ, ACM, 2009, [Online]. Available from: http://doi.acm.org/10.1145/1596655.1596658
+
+[9]<a name="9"/> D. A. Bauer and J. Mäkiö, "Multi-Runtime Actor Model Implementation and Benchmarks," IECON 2025 – 51st Annual Conference of the IEEE Industrial Electronics Society, Madrid, Spain, 2025. [Online]. Available from: https://doi.org/10.1109/iecon58223.2025.11221487
